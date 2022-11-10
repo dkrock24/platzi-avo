@@ -1,32 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/router';
-
+import fetch from 'isomorphic-unfetch'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import Layout from '@components/Layout/Layout'
 import ProductSummary from '@components/ProductSummary/ProductSummary'
 
-export default function ProductItem(request, response) {
+export const getStaticPaths = async () => {
+    // Generate static pages using the products ids
+    const response = await fetch('https://platzi-avo-l9i8.vercel.app/api/avo');
+    const productList = await response.json();
 
-    //const router = useRouter();
+    const paths = productList.data.map((avo) => ({
+        params: {
+            id: avo.id
+        }
+    }));
 
-    const [product, setProduct] = useState([]);
+    return {
+        paths: paths,
+        fallback: false
+    }
+}
 
-    const {
-        query: { id },
-    } = useRouter();
+export const getStaticProps = async ({ params }) => {
+    let id = params.id;
 
+    const response = await fetch(`https://platzi-avo-l9i8.vercel.app/api/avo/${id}`);
+    const product = await response.json();
 
-    useEffect(() => {
-        window
-            .fetch('../api/avo/' + id)
-            .then((response) => response.json())
-            .then(({ data, length }) => {
-                setProduct(data)
-            })
-    }, []);
+    return {
+        props: {
+            product,
+            id
+        }
+    }
+}
+
+export default function ProductItem({ product, id }) {
 
     return (
         <Layout>
-            {product == null ? null : <ProductSummary product={product} />}
+            {product == null ? null : <ProductSummary product={product.data} />}
         </Layout>
 
     )

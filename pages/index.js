@@ -4,7 +4,7 @@ import fetch from 'isomorphic-unfetch';
 import KawaiiHeader from '@components/KawaiiHeader/KawaiiHeader'
 import ProductList from '@components/ProductList/ProductList'
 
-export const getServerSideProps = async () => {
+export const getStaticProps = async () => {
 
     const response = await fetch('https://platzi-avo-l9i8.vercel.app/api/avo');
     const productList = await response.json();
